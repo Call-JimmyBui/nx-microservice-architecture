@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - main   # ← sửa master thành main nếu repo của bạn đang dùng main
   pull_request:
 
 permissions:
@@ -19,15 +19,15 @@ jobs:
           filter: tree:0
           fetch-depth: 0
 
-      # Setup Node.js + pnpm
+      # ✅ Setup pnpm TRƯỚC node
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
-
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
 
       # Install dependencies
       - run: pnpm install
@@ -36,4 +36,8 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
 
       # Run affected tasks (lint, test, build)
+      - run: pnpm install
+
+      - uses: nrwl/nx-set-shas@v4
+
       - run: pnpm nx affected -t lint test build

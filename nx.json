@@ -38,7 +38,29 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/microservice-e2e/**/*"]
+      "exclude": [
+        "apps/microservice-e2e/**/*",
+        "apps/api-gateway-e2e/**/*",
+        "apps/product-service-e2e/**/*",
+        "apps/order-service-e2e/**/*",
+        "apps/user-service-e2e/**/*",
+        "apps/cart-service-e2e/**/*",
+        "apps/notification-service-e2e/**/*",
+        "apps/payment-service-e2e/**/*"
+      ]
     }
-  ]
+  ],
+  "targetDefaults": {
+    "build": {
+      "options": {
+        "assets": [
+          {
+            "glob": "**/*.proto",
+            "input": "proto",
+            "output": "proto"
+          }
+        ]
+      }
+    }
+  }
 }

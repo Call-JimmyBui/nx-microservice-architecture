@@ -1,0 +1,57 @@
+// File: apps/payment-service/src/proto/payment.proto
+syntax = "proto3";
+
+package payments;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service PaymentService {
+  rpc ProcessPayment (ProcessPaymentRequest) returns (PaymentResponse);
+  rpc GetPaymentStatus (GetPaymentStatusRequest) returns (PaymentStatusResponse);
+  // Có thể thêm RefundPayment, CapturePayment, v.v.
+}
+
+enum PaymentStatusProto {
+  PENDING = 0;
+  SUCCESS = 1;
+  FAILED = 2;
+  REFUNDED = 3;
+}
+
+message PaymentProto {
+  string id = 1;
+  string orderId = 2;
+  string userId = 3;
+  double amount = 4;
+  string currency = 5;
+  PaymentStatusProto status = 6;
+  string paymentMethod = 7;
+  string transactionId = 8; // ID từ cổng thanh toán bên thứ ba
+  google.protobuf.Timestamp createdAt = 9;
+  google.protobuf.Timestamp updatedAt = 10;
+}
+
+message ProcessPaymentRequest {
+  string orderId = 1;
+  string userId = 2;
+  double amount = 3;
+  string currency = 4;
+  string paymentMethod = 5;
+  // Có thể thêm thông tin thẻ tín dụng hoặc token thanh toán
+}
+
+message GetPaymentStatusRequest {
+  string paymentId = 1;
+  optional string orderId = 2;
+}
+
+message PaymentResponse {
+  PaymentProto payment = 1;
+}
+
+message PaymentStatusResponse {
+  PaymentStatusProto status = 1;
+  string message = 2;
+  optional PaymentProto payment = 3; // Có thể trả về toàn bộ payment nếu muốn
+}

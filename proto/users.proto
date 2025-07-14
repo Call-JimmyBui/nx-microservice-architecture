@@ -1,0 +1,122 @@
+//apps/user-service/src/proto/users.proto
+
+syntax = "proto3";
+
+package users;
+
+import "google/protobuf/timestamp.proto"; 
+import "google/protobuf/empty.proto";
+
+// -----------------------------------------------------------
+// SERVICE DEFINITION
+// -----------------------------------------------------------
+
+service UserService {
+  // RPC để tạo người dùng mới
+  rpc CreateUser (CreateUserRequest) returns (UserResponse);
+
+  // RPC để lấy thông tin người dùng theo ID
+  rpc GetUserById (GetUserByIdRequest) returns (UserResponse);
+
+  // RPC để lấy thông tin người dùng theo Username
+  rpc GetUserByUsername (GetUserByUsernameRequest) returns (UserResponse);
+
+  // RPC để lấy tất cả người dùng
+  rpc GetAllUsers (google.protobuf.Empty) returns (UsersResponse);
+
+  // RPC để cập nhật thông tin người dùng
+  rpc UpdateUser (UpdateUserRequest) returns (UserResponse);
+
+  // RPC để xóa người dùng
+  rpc DeleteUser (DeleteUserRequest) returns (google.protobuf.Empty);
+
+  // RPC để xác thực người dùng (login)
+  rpc AuthenticateUser (AuthenticateUserRequest) returns (AuthenticationResponse);
+}
+
+// -----------------------------------------------------------
+// MESSAGE DEFINITIONS
+// -----------------------------------------------------------
+
+enum UserRoleProto {
+  CUSTOMER = 0;
+  ADMIN = 1;
+  SELLER = 2;
+}
+
+// Basic User Message (dùng cho phản hồi)
+message UserProto {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  optional string phoneNumber = 4;
+  optional string firstName = 5;
+  optional string lastName = 6;
+  google.protobuf.Timestamp createdAt = 7;
+  google.protobuf.Timestamp updatedAt = 8;
+  bool isActive = 9;
+  UserRoleProto role = 10;
+  string deviceToken = 11;
+}
+
+// Request khi tạo người dùng
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  optional string phoneNumber = 4;
+  optional string firstName = 5;
+  optional string lastName = 6;
+  optional UserRoleProto role = 7;
+}
+
+// Request khi lấy người dùng theo ID
+message GetUserByIdRequest {
+  string id = 1;
+}
+
+// Request khi lấy người dùng theo Username
+message GetUserByUsernameRequest {
+  string username = 1;
+}
+
+// Request khi cập nhật người dùng
+message UpdateUserRequest {
+  string id = 1;
+  optional string username = 2;
+  optional string email = 3;
+  optional string phoneNumber = 4;
+  optional string firstName = 5;
+  optional string lastName = 6;
+  optional bool isActive = 7;
+  optional UserRoleProto role = 8;
+}
+
+// Request khi xóa người dùng
+message DeleteUserRequest {
+  string id = 1;
+}
+
+// Request khi xác thực người dùng (login)
+message AuthenticateUserRequest {
+  string username = 1;
+  string password = 2;
+}
+
+// Phản hồi khi xác thực người dùng
+message AuthenticationResponse {
+  bool success = 1;
+  string message = 2;
+  optional string accessToken = 3;
+  optional UserProto user = 4;
+}
+
+// Phản hồi chung cho các thao tác User (chứa 1 User)
+message UserResponse {
+  optional UserProto user = 1;
+}
+
+// Phản hồi cho GetAllUsers (chứa danh sách User)
+message UsersResponse {
+  repeated UserProto users = 1;
+}

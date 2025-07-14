@@ -8,13 +8,22 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
+    "strict": false,
     "target": "es2015",
     "module": "esnext",
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@microservice/common": ["libs/common/src/index.ts"],
+      "@microservice/database": ["libs/database/src/index.ts"],
+      "@microservice/dto": ["libs/dto/src/index.ts"],
+      "@microservice/grpc-client-utility": [
+        "libs/grpc-client-utility/src/index.ts"
+      ],
+      "@microservice/types": ["types/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

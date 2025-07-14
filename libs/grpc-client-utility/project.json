@@ -1,0 +1,9 @@
+{
+  "name": "grpc-client-utility",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/grpc-client-utility/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project grpc-client-utility --web",
+  "targets": {}
+}

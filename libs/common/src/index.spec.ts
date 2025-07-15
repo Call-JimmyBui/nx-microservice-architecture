@@ -1,1 +1,5 @@
-describe('common dummy test', () => { it('should pass', () => { expect(true).toBe(true); }); });
+describe('common', () => {
+  it('should pass a dummy test', () => {
+    expect(true).toBe(true);
+  });
+});

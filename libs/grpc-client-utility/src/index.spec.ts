@@ -1,1 +1,5 @@
-describe('grpc-client-utility dummy test', () => { it('should pass', () => { expect(true).toBe(true); }); });
+describe('grpc-client-utility', () => {
+  it('should pass a dummy test', () => {
+    expect(true).toBe(true);
+  });
+});

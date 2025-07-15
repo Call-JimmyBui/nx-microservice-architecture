@@ -9,7 +9,7 @@
     "test": {
       "executor": "@nx/jest:jest",
       "options": {
-        "jestConfig": "libs/common/jest.config.ts",
+        "jestConfig": "libs/grpc-client-utility/jest.config.ts",
         "passWithNoTests": true
       }
     }

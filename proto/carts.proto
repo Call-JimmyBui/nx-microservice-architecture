@@ -1,0 +1,57 @@
+// apps/cart-service/src/proto/cart.proto
+syntax = "proto3";
+
+package carts;
+
+import "google/protobuf/empty.proto";
+
+service CartService {
+  rpc AddItemToCart (AddItemToCartRequest) returns (CartResponse);
+  rpc GetCart (GetCartRequest) returns (CartResponse);
+  rpc UpdateCartItemQuantity (UpdateCartItemQuantityRequest) returns (CartResponse);
+  rpc RemoveItemFromCart (RemoveItemFromCartRequest) returns (CartResponse);
+  rpc ClearCart (ClearCartRequest) returns (google.protobuf.Empty);
+}
+
+message CartItemProto {
+  string productId = 1;
+  int32 quantity = 2;
+  // Có thể thêm thông tin sản phẩm chi tiết nếu muốn, ví dụ: name, price
+  string productName = 3;
+  double productPrice = 4;
+}
+
+message CartProto {
+  string userId = 1;
+  repeated CartItemProto items = 2;
+  double totalAmount = 3; // Tổng tiền giỏ hàng
+}
+
+message AddItemToCartRequest {
+  string userId = 1;
+  string productId = 2;
+  int32 quantity = 3;
+}
+
+message GetCartRequest {
+  string userId = 1;
+}
+
+message UpdateCartItemQuantityRequest {
+  string userId = 1;
+  string productId = 2;
+  int32 quantity = 3; // Số lượng mới
+}
+
+message RemoveItemFromCartRequest {
+  string userId = 1;
+  string productId = 2;
+}
+
+message ClearCartRequest {
+  string userId = 1;
+}
+
+message CartResponse {
+  CartProto cart = 1;
+}

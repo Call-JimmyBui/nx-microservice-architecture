@@ -1,0 +1,173 @@
+// apps/product-service/src/proto/products.proto
+
+syntax = "proto3";
+
+package products;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// -----------------------------------------------------------
+// SERVICE DEFINITION
+// -----------------------------------------------------------
+
+service ProductService {
+  // Products RPCs
+  rpc CreateProduct (CreateProductRequest) returns (ProductResponse);
+  rpc GetProductById (GetProductByIdRequest) returns (ProductResponse);
+  rpc GetProductsByIds (GetProductsByIdsRequest) returns (ProductsResponse); // <-- ĐÃ CÓ
+  rpc GetAllProducts (GetAllProductsRequest) returns (ProductsResponse);
+  rpc UpdateProduct (UpdateProductRequest) returns (ProductResponse);
+  rpc DeleteProduct (DeleteProductRequest) returns (google.protobuf.Empty);
+  rpc GetProductsByCategoryId (GetProductsByCategoryIdRequest) returns (ProductsResponse);
+  rpc CheckProductStock (CheckProductStockRequest) returns (CheckProductStockResponse);
+  rpc DecreaseStock (DecreaseStockRequest) returns (DecreaseStockResponse); // <-- Cần THÊM RPC này
+}
+
+service CategoryService { // Tên service mới
+  rpc CreateCategory (CreateCategoryRequest) returns (CategoryResponse);
+  rpc GetCategoryById (GetCategoryByIdRequest) returns (CategoryResponse);
+  rpc GetAllCategories (google.protobuf.Empty) returns (CategoriesResponse);
+  rpc UpdateCategory (UpdateCategoryRequest) returns (CategoryResponse);
+  rpc DeleteCategory (DeleteCategoryRequest) returns (google.protobuf.Empty);
+}
+
+// -----------------------------------------------------------
+// MESSAGE DEFINITIONS - PRODUCTS
+// -----------------------------------------------------------
+
+message ProductProto {
+  string id = 1;
+  string name = 2;
+  optional string description = 3;
+  double price = 4;
+  int32 stockQuantity = 5;
+  optional string imageUrl = 6;
+  google.protobuf.Timestamp createdAt = 7;
+  google.protobuf.Timestamp updatedAt = 8;
+  bool isActive = 9;
+  string categoryId = 10; // ID của Category liên kết
+  optional CategoryProto category = 11;
+}
+
+message CreateProductRequest {
+  string name = 1;
+  optional string description = 2;
+  double price = 3;
+  int32 stockQuantity = 4;
+  optional string imageUrl = 5;
+  string categoryId = 6;
+}
+
+message GetProductByIdRequest {
+  string id = 1;
+}
+
+message GetProductsByIdsRequest { // <-- ĐÃ CÓ
+  repeated string ids = 1;
+}
+
+message GetAllProductsRequest {
+  // Có thể thêm pagination, filter ở đây
+  int32 page = 1;
+  int32 limit = 2;
+  optional string search = 3;
+  optional string categoryId = 4;
+}
+
+message UpdateProductRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  optional double price = 4;
+  optional int32 stockQuantity = 5;
+  optional string imageUrl = 6;
+  optional bool isActive = 7;
+  optional string categoryId = 8;
+}
+
+message GetProductsByCategoryIdRequest {
+  string categoryId = 1;
+}
+
+message CheckProductStockRequest {
+  string productId = 1;
+  int32 quantity = 2;
+}
+
+message CheckProductStockResponse {
+  bool isAvailable = 1;
+  int32 currentStock = 2;
+}
+
+// <-- THÊM CÁC MESSAGE NÀY NẾU CHƯA CÓ TRONG FILE products.proto CỦA BẠN
+message DecreaseStockRequest {
+  string productId = 1;
+  int32 quantity = 2;
+}
+
+message DecreaseStockResponse {
+  bool success = 1;
+  optional string message = 2;
+  optional int32 newStockQuantity = 3;
+}
+// -----------------------------------------------------------------------
+
+message ProductResponse {
+  ProductProto product = 1;
+}
+
+message DeleteProductRequest {
+  string productId = 1;
+}
+
+message DeleteProductResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ProductsResponse {
+  repeated ProductProto products = 1;
+  int32 totalCount = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}
+
+// -----------------------------------------------------------
+// MESSAGE DEFINITIONS - CATEGORIES
+// -----------------------------------------------------------
+
+message CategoryProto {
+  string id = 1;
+  string name = 2;
+  optional string description = 3;
+  google.protobuf.Timestamp createdAt = 4;
+  google.protobuf.Timestamp updatedAt = 5;
+}
+
+message CreateCategoryRequest {
+  string name = 1;
+  optional string description = 2;
+}
+
+message GetCategoryByIdRequest {
+  string id = 1;
+}
+
+message UpdateCategoryRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+}
+
+message DeleteCategoryRequest {
+  string id = 1;
+}
+
+message CategoryResponse {
+  CategoryProto category = 1;
+}
+
+message CategoriesResponse {
+  repeated CategoryProto categories = 1;
+}

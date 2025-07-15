@@ -1,0 +1,40 @@
+// File: apps/notification-service/src/proto/notification.proto
+syntax = "proto3";
+
+package notifications;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+service NotificationService {
+  rpc SendEmail (SendEmailRequest) returns (google.protobuf.Empty);
+  rpc SendSMS (SendSmsRequest) returns (google.protobuf.Empty);
+  rpc SendPushNotification (SendPushNotificationRequest) returns (google.protobuf.Empty);
+  // Có thể thêm GetNotificationHistory, MarkNotificationAsRead, v.v.
+}
+
+enum NotificationTypeProto {
+  EMAIL = 0;
+  SMS = 1;
+  PUSH_NOTIFICATION = 2;
+}
+
+message SendEmailRequest {
+  string recipientEmail = 1;
+  string subject = 2;
+  string body = 3;
+  // Optional: senderEmail, htmlBody
+}
+
+message SendSmsRequest {
+  string recipientPhoneNumber = 1;
+  string message = 2;
+  // Optional: senderId
+}
+
+message SendPushNotificationRequest {
+  string userId = 1; // User ID để tìm thiết bị nhận
+  string title = 2;
+  string body = 3;
+  // Optional: payload (JSON string), imageUrl, targetScreen
+}

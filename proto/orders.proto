@@ -1,0 +1,79 @@
+// File: apps/order-service/src/proto/orders.proto
+syntax = "proto3";
+
+package orders;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "products.proto";
+import "users.proto";
+
+service OrderService {
+  rpc CreateOrder (CreateOrderRequest) returns (OrderResponse);
+  rpc GetOrderById (GetOrderByIdRequest) returns (OrderResponse);
+  rpc GetOrdersByUserId (GetOrdersByUserIdRequest) returns (OrdersResponse);
+  rpc UpdateOrderStatus (UpdateOrderStatusRequest) returns (OrderResponse);
+}
+
+enum OrderStatusProto {
+  PENDING = 0;
+  PROCESSING = 1;
+  SHIPPED = 2;
+  DELIVERED = 3;
+  CANCELLED = 4;
+  PAYMENT_FAILED = 5;
+}
+
+message OrderItemProto {
+  string productId = 1;
+  int32 quantity = 2;
+  double priceAtOrder = 3; // Giá tại thời điểm đặt hàng
+  optional products.ProductProto productDetails = 4; // Có thể nhúng thông tin sản phẩm
+}
+
+message OrderProto {
+  string id = 1;
+  string userId = 2;
+  repeated OrderItemProto items = 3;
+  double totalAmount = 4;
+  OrderStatusProto status = 5;
+  string shippingAddress = 6;
+  string paymentMethod = 7;
+  google.protobuf.Timestamp createdAt = 8;
+  google.protobuf.Timestamp updatedAt = 9;
+  // optional users.UserProto userDetails = 10; // Có thể nhúng thông tin người dùng
+}
+
+message CreateOrderRequest {
+  string userId = 1;
+  repeated OrderItemProto items = 2; // Chỉ cần productId và quantity
+  string shippingAddress = 3;
+  string paymentMethod = 4;
+}
+
+message GetOrderByIdRequest {
+  string id = 1;
+}
+
+message GetOrdersByUserIdRequest {
+  string userId = 1;
+  int32 page = 2;
+  int32 limit = 3;
+}
+
+message UpdateOrderStatusRequest {
+  string id = 1;
+  OrderStatusProto status = 2;
+  optional string note = 3; // Ghi chú lý do cập nhật trạng thái
+}
+
+message OrderResponse {
+  OrderProto order = 1;
+}
+
+message OrdersResponse {
+  repeated OrderProto orders = 1;
+  int32 totalCount = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}

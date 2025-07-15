@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main   # ← sửa master thành main nếu repo của bạn đang dùng main
+  pull_request:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: tree:0
+          fetch-depth: 0
+
+      # ✅ Setup pnpm TRƯỚC node
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      # Install dependencies
+      - run: pnpm install
+
+      # Set Git SHAs for Nx affected commands
+      - uses: nrwl/nx-set-shas@v4
+
+      # Run affected tasks (lint, test, build)
+      - run: pnpm install
+
+      - uses: nrwl/nx-set-shas@v4
+
+      - run: pnpm nx affected -t lint test build

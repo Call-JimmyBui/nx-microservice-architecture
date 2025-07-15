@@ -4,7 +4,6 @@
   "sourceRoot": "apps/user-service/src",
   "projectType": "application",
   "tags": [],
-  "implicitDependencies": ["common"],
   "targets": {
     "build": {
       "executor": "nx:run-commands",

@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default {
   displayName: 'grpc-client-utility',
   preset: '../../jest.preset.js',

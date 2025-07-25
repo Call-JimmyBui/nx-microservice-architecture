@@ -26,7 +26,8 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TimestampInterceptor());
 
-  await app.listen(4000);
+  const port = process.env.PORT || 4000;
+  await app.listen(port, '0.0.0.0');
   Logger.log(
     `🚀 Api-Gateway Microservices is running port 4000}`
   );

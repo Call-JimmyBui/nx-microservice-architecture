@@ -1,0 +1,15 @@
+# k8s/api-gateway/api-gateway-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-gateway-service # <--- Tên này phải khớp với tên trong Ingress!
+  labels:
+    app: api-gateway
+spec:
+  selector:
+    app: api-gateway # Chọn các Pods có label 'app: api-gateway'
+  ports:
+    - protocol: TCP
+      port: 4000 # <-- Cổng mà service sẽ expose trong cluster
+      targetPort: 4000 # <-- Cổng thực tế mà container lắng nghe
+  type: ClusterIP # Chỉ expose bên trong cluster, Ingress sẽ lo phần bên ngoài

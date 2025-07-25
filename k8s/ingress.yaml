@@ -1,0 +1,17 @@
+# k8s/ingress.yaml (Nếu bạn muốn dùng API Gateway)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-gateway-ingress
+spec:
+  rules:
+  - host: myapp.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway-service
+            port:
+              number: 4000 # Cổng HTTP/REST của API Gateway

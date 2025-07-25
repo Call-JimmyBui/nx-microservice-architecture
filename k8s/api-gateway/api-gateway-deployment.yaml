@@ -1,0 +1,95 @@
+# k8s/api-gateway/api-gateway-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-deployment
+  labels:
+    app: api-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+      - name: api-gateway-container
+        image: heisenberg8705/api-gateway:latest
+        ports:
+        - containerPort: 4000
+        env:
+          # Biến môi trường cho Kubernetes
+          - name: NODE_ENV
+            value: "production"
+
+          # Cấu hình các Microservice gRPC
+          - name: NOTIFICATION_SERVICE_GRPC_HOST
+            value: "notification-service"
+          - name: NOTIFICATION_SERVICE_GRPC_PORT
+            value: "50055"
+          - name: NOTIFICATION_SERVICE_NAMESPACE 
+            value: "default"
+          - name: PRODUCT_SERVICE_GRPC_HOST
+            value: "product-service"
+          - name: PRODUCT_SERVICE_GRPC_PORT
+            value: "50051"
+          - name: PRODUCT_SERVICE_NAMESPACE 
+            value: "default"
+
+          # === THÊM LẠI CÁC BIẾN MÔI TRƯỜNG NÀY ===
+          - name: DB_HOST
+            value: "host.docker.internal" # Hoặc tên service K8s nếu DB chạy trong K8s
+          - name: DB_PORT
+            value: "27017" # Cổng MongoDB mặc định, thay đổi nếu dùng DB khác
+          - name: DB_USERNAME
+            value: "postgres" # Thay bằng username của bạn
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets # Đảm bảo secret này tồn tại
+                key: DB_PASSWORD # Đảm bảo key này tồn tại trong secret
+          - name: API_GATEWAY_DB_DATABASE # Tên DB cho API Gateway
+            value: "api_gateway_db"
+          - name: DB_SYNCHRONIZE
+            value: "true" # Cẩn thận với production, chỉ dùng cho dev
+
+          - name: RABBITMQ_HOST
+            value: "host.docker.internal" # Hoặc tên service K8s
+          - name: RABBITMQ_PORT
+            value: "5672"
+          - name: RABBITMQ_USER
+            value: "guest"
+          - name: RABBITMQ_PASSWORD
+            value: "guest"
+
+          - name: REDIS_HOST
+            value: "host.docker.internal" # Hoặc tên service K8s
+          - name: REDIS_PORT
+            value: "6379"
+
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets # Đảm bảo secret này tồn tại
+                key: JWT_SECRET # Đảm bảo key này tồn tại trong secret
+          # ==========================================
+
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 4000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 4000
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3

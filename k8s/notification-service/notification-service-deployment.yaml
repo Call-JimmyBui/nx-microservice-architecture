@@ -1,0 +1,94 @@
+# k8s/notification-service/notification-service-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification-service-deployment
+  labels:
+    app: notification-service
+spec:
+  replicas: 1 # Số lượng bản sao (pods) của service này
+  selector:
+    matchLabels:
+      app: notification-service
+  template:
+    metadata:
+      labels:
+        app: notification-service
+    spec:
+      containers:
+      - name: notification-service-container
+        image: heisenberg8705/notification-service:latest # Đã thay thế bằng username của bạn
+        ports:
+        - containerPort: 50055 # Lắng nghe trên cổng gRPC của NOTIFICATION_SERVICE_GRPC_PORT
+        env:
+          # Cấu hình Database cho Notification Service
+          - name: DB_HOST
+            value: "host.docker.internal" # <-- Đã điều chỉnh để kết nối tới DB trên máy host
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_USERNAME
+            value: "postgres"
+          - name: DB_PASSWORD
+            valueFrom: # Lấy password từ Secret đã tạo
+              secretKeyRef:
+                name: app-secrets
+                key: DB_PASSWORD
+          - name: NOTIFICATION_DB_DATABASE
+            value: "notification_db" # Tên database riêng cho Notification Service
+          - name: DB_SYNCHRONIZE
+            value: "true" # Chỉ dùng cho Dev/Test
+
+          # Cấu hình gRPC Port
+          - name: NOTIFICATION_SERVICE_GRPC_PORT
+            value: "50055" # Port này cần khớp với containerPort
+
+          # Cấu hình Emailer
+          - name: EMAIL_SERVICE_HOST
+            value: "smtp.gmail.com"
+          - name: EMAIL_SERVICE_PORT
+            value: "465"
+          - name: EMAIL_SERVICE_SECURE
+            value: "true"
+          - name: EMAIL_SERVICE_USER
+            value: "sixika1234@gmail.com" # Hoặc dùng Secret nếu email này nhạy cảm
+          - name: EMAIL_SERVICE_PASS
+            valueFrom: # Lấy password từ Secret
+              secretKeyRef:
+                name: app-secrets
+                key: EMAIL_SERVICE_PASS
+          - name: EMAIL_FROM
+            value: "huunhan8705@gmail.com" # Hoặc dùng Secret
+
+          # Cấu hình RabbitMQ (nếu notification-service dùng RabbitMQ)
+          - name: RABBITMQ_HOST
+            value: "host.docker.internal" # <-- Đã điều chỉnh để kết nối tới RabbitMQ trên máy host
+          - name: RABBITMQ_PORT
+            value: "5672"
+          - name: RABBITMQ_USER
+            value: "guest"
+          - name: RABBITMQ_PASSWORD
+            value: "guest" # Hoặc dùng Secret
+          - name: RABBITMQ_ORDER_QUEUE
+            value: "rabbitMQ_order_queue"
+
+          # Cấu hình JWT (nếu notification-service cần JWT_SECRET)
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: app-secrets
+                key: JWT_SECRET
+
+        livenessProbe:
+          tcpSocket: # <-- ĐÃ THAY ĐỔI THÀNH tcpSocket
+            port: 50055
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          tcpSocket: # <-- ĐÃ THAY ĐỔI THÀNH tcpSocket
+            port: 50055
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3

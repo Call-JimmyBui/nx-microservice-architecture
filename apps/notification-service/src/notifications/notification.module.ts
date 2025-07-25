@@ -6,9 +6,30 @@ import { join } from 'path';
 import { USER_SERVICE_NAME, UsersProtobufPackage } from '@microservice/types';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RABBITMQ_SERVICE } from '@microservice/common';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
+    MailerModule.forRootAsync({
+      imports: [ConfigModule], 
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('EMAIL_SERVICE_HOST'),
+          port: configService.get<number>('EMAIL_SERVICE_PORT'),
+          secure: configService.get<string>('EMAIL_SERVICE_SECURE') === 'true',
+          auth: {
+            user: configService.get<string>('EMAIL_SERVICE_USER'),
+            pass: configService.get<string>('EMAIL_SERVICE_PASS'),
+          },
+          tls: {},
+        },
+        defaults: {
+          from: `"${configService.get<string>('EMAIL_FROM_NAME', 'Your App')}" <${configService.get<string>('EMAIL_FROM')}>`,
+        },
+      }),
+      inject: [ConfigService],
+    }),
+
     ClientsModule.registerAsync([
       {
         name: USER_SERVICE_NAME,

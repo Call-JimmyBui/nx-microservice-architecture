@@ -41,8 +41,11 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
+            - name: grpc-app
               containerPort: {{ .Values.service.port }}
+              protocol: TCP
+            - name: http-metrics
+              containerPort: {{ .Values.metrics.targetPort }}
               protocol: TCP
           env:
             # Các biến môi trường có giá trị trực tiếp từ .Values.env

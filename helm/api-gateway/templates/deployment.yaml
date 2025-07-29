@@ -44,6 +44,9 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+            - name: http-metrics
+              containerPort: {{ .Values.metrics.targetPort }}
+              protocol: TCP
           env:
             # Các biến môi trường có giá trị trực tiếp từ .Values.env
             {{- range $key, $value := .Values.env }}

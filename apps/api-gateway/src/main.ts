@@ -1,22 +1,19 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
 import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { TimestampInterceptor } from './common/interceptors/timestamp.interceptor';
+import * as promClient from 'prom-client';
+import express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Cấu hình Global Pipes (Validate)
-  // app.useGlobalPipes(new ValidationPipe({
-  //   whitelist: true,                     // Loại bỏ các thuộc tính không có trong DTO
-  //   forbidNonWhitelisted: true,          // Báo lỗi nếu có thuộc tính không được phép
-  //   transform: true,                     // Tự động biến đổi payload thành instance của DTO
-  // }));
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }));
 
   // Kích hoạt CORS (quan trọng cho frontend)
   app.enableCors();
@@ -31,5 +28,27 @@ async function bootstrap() {
   Logger.log(
     `🚀 Api-Gateway Microservices is running port 4000}`
   );
+
+    // 2. Khởi tạo và lắng nghe metrics server TRÊN CỔNG RIÊNG
+  const metricsApp = express();
+  const metricsPort = process.env.METRICS_PORT || 9097; // Sử dụng cổng riêng 9097
+  const metricsPath = '/metrics';
+
+  promClient.collectDefaultMetrics();
+
+  metricsApp.get(metricsPath, async (req, res) => {
+    try {
+      res.set('Content-Type', promClient.register.contentType);
+      res.end(await promClient.register.metrics());
+    } catch (ex) {
+      res.status(500).end(ex);
+    }
+  });
+
+  metricsApp.listen(metricsPort, () => {
+    console.log(`Prometheus metrics server running on port ${metricsPort}, path ${metricsPath}`);
+  });
+
+  console.log('Application bootstrap complete. Both gRPC and Metrics servers should be running.');
 }
 bootstrap();

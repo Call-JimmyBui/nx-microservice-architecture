@@ -1,0 +1,18 @@
+# helm/user-service/templates/servicemonitor.yaml
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "user-service.fullname" . }}
+  labels:
+    {{ include "user-service.labels" . | nindent 4 }}
+    release: prometheus-stack 
+spec:
+  selector:
+    matchLabels:
+      {{ include "user-service.selectorLabels" . | nindent 4 }}
+  endpoints:
+    - port: http-metrics 
+      path: /metrics     
+      interval: 15s      
+{{- end }}

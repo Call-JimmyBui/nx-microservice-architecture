@@ -63,6 +63,6 @@ COPY --from=builder /app/dist/apps/product-service/ ./
 
 # Expose cổng Product Service (cổng gRPC)
 EXPOSE 50051
-
+EXPOSE 9091
 # Start app
 CMD ["node", "main.js"]

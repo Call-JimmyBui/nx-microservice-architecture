@@ -1,0 +1,18 @@
+# helm/order-service/templates/servicemonitor.yaml
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "order-service.fullname" . }}
+  labels:
+    {{ include "order-service.labels" . | nindent 4 }}
+    release: prometheus-stack 
+spec:
+  selector:
+    matchLabels:
+      {{ include "order-service.selectorLabels" . | nindent 4 }}
+  endpoints:
+    - port: http-metrics 
+      path: /metrics     
+      interval: 15s      
+{{- end }}

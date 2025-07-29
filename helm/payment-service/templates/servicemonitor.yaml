@@ -1,0 +1,18 @@
+# helm/payment-service/templates/servicemonitor.yaml
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "payment-service.fullname" . }}
+  labels:
+    {{ include "payment-service.labels" . | nindent 4 }}
+    release: prometheus-stack 
+spec:
+  selector:
+    matchLabels:
+      {{ include "payment-service.selectorLabels" . | nindent 4 }}
+  endpoints:
+    - port: http-metrics 
+      path: /metrics     
+      interval: 15s      
+{{- end }}

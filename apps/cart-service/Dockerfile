@@ -19,4 +19,5 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 COPY --from=builder /app/dist/apps/cart-service/ ./
 EXPOSE 50056
+EXPOSE 9096
 CMD ["node", "main.js"]

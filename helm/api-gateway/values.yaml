@@ -83,6 +83,12 @@ service:
   type: ClusterIP
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 4000
+  targetPort: 4000
+
+metrics:
+  enabled: true 
+  port: 9097
+  targetPort: 9097
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -117,8 +123,8 @@ resources: {}
 livenessProbe:
   enabled: true
   httpGet:
-    path: /api/v1/health
-    port: 4000
+    path: /metrics
+    port: 9097
   initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 3
@@ -127,8 +133,8 @@ livenessProbe:
 readinessProbe:
   enabled: true
   httpGet:
-    path: /api/v1/health
-    port: 4000
+    path: /metrics
+    port: 9097
   initialDelaySeconds: 15
   periodSeconds: 5
   timeoutSeconds: 3

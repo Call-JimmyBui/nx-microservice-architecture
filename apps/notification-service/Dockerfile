@@ -63,6 +63,6 @@ COPY --from=builder /app/dist/apps/notification-service/ ./
 
 # Expose cổng Notification Service (thường là cổng gRPC)
 EXPOSE 50055
-
+EXPOSE 9095
 # Start app
 CMD ["node", "main.js"]

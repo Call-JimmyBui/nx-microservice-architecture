@@ -47,6 +47,6 @@ COPY --from=builder /app/dist/apps/api-gateway/ ./
 
 # Expose cổng API Gateway
 EXPOSE 4000
-
+EXPOSE 9097
 # Start app
 CMD ["node", "main.js"]

@@ -19,4 +19,5 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 COPY --from=builder /app/dist/apps/payment-service/ ./
 EXPOSE 50054
+EXPOSE 9094
 CMD ["node", "main.js"]

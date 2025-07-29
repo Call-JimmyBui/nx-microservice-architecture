@@ -1,0 +1,17 @@
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "api-gateway.fullname" . }}
+  labels:
+    {{ include "api-gateway.labels" . | nindent 4 }}
+    release: prometheus-stack 
+spec:
+  selector:
+    matchLabels:
+      {{ include "api-gateway.selectorLabels" . | nindent 4 }}
+  endpoints:
+    - port: http-metrics 
+      path: /metrics     
+      interval: 15s      
+{{- end }}

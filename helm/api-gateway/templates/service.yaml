@@ -8,8 +8,12 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: http
+      targetPort: {{ .Values.service.port }}
       protocol: TCP
-      name: http
+      name: grpc-app 
+    - port: {{ .Values.metrics.port }}
+      targetPort: {{ .Values.metrics.targetPort }}
+      protocol: TCP
+      name: http-metrics
   selector:
     {{- include "api-gateway.selectorLabels" . | nindent 4 }}
